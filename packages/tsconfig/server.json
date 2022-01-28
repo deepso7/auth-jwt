@@ -3,9 +3,12 @@
   "display": "Server",
   "extends": "./base.json",
   "compilerOptions": {
-    "target": "ES6",
-    "noEmit": false,
+    "target": "es2017",
     "module": "commonjs",
-    "sourceMap": true
-  }
+    "lib": ["dom", "es6", "es2017", "esnext.asynciterable"],
+    "sourceMap": true,
+    "experimentalDecorators": true
+  },
+  "include": ["./src"],
+  "exclude": ["node_modules"]
 }
