@@ -36,6 +36,8 @@ import { sendRefreshToken } from "./sendRefreshToken";
       try {
         const user = await User.findOne({ id: payload.userId });
         if (!user) return res.status(400).json({ ok: false, accessToken: "" });
+        if (user.tokenVersion !== payload.tokenVersion)
+          return res.status(400).json({ ok: false, accessToken: "" });
         // Update the refresh token
         sendRefreshToken(res, createRefreshToken(user));
         return res.json({ ok: true, accessToken: createAccessToken(user) });
