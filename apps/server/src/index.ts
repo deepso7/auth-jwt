@@ -1,3 +1,4 @@
+import "dotenv/config";
 import "reflect-metadata";
 import { createConnection } from "typeorm";
 import express from "express";
@@ -19,6 +20,7 @@ import { UserResolver } from "./UserResolvers";
       schema: await buildSchema({
         resolvers: [UserResolver],
       }),
+      context: ({ req, res }) => ({ req, res }),
     });
 
     await apolloServer.start();
