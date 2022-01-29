@@ -6,11 +6,14 @@ import {
   ObjectType,
   Query,
   Resolver,
+  UseMiddleware,
 } from "type-graphql";
 import argon2 from "argon2";
+
 import User from "./entity/User";
 import { MyContext } from "./MyContext";
 import { createAccessToken, createRefreshToken } from "./auth";
+import { isAuth } from "./isAuth";
 
 @ObjectType()
 class LoginResponse {
@@ -23,6 +26,13 @@ export class UserResolver {
   @Query(() => String)
   hello() {
     return "Hi!";
+  }
+
+  @Query(() => String)
+  @UseMiddleware(isAuth)
+  bye(@Ctx() { payload }: MyContext) {
+    console.log({ payload });
+    return `Bye user id: ${payload!.userId}`;
   }
 
   @Query(() => [User])
