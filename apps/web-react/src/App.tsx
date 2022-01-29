@@ -1,5 +1,7 @@
 import { FC } from "react";
-import { BrowserRouter, Link, Route, Routes } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+
+import Header from "./components/Header";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -8,19 +10,7 @@ const App: FC = () => {
   return (
     <BrowserRouter>
       <div>
-        <header>
-          <div>
-            <div>
-              <Link to="/">Home</Link>
-            </div>
-            <div>
-              <Link to="register">Register</Link>
-            </div>
-            <div>
-              <Link to="login">Login</Link>
-            </div>
-          </div>
-        </header>
+        <Header />
 
         <Routes>
           <Route path="/" element={<Home />} />
