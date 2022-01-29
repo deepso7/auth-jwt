@@ -8,19 +8,27 @@
     "preview": "vite preview",
     "test": "echo \"Vite-React test\"",
     "server": "*",
-    "ui": "*"
+    "ui": "*",
+    "gen": "graphql-codegen --config codegen.yml"
   },
   "dependencies": {
+    "@apollo/client": "^3.5.8",
+    "graphql": "15.7.2",
     "react": "^17.0.2",
     "react-dom": "^17.0.2"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "2.4.0",
+    "@types/graphql": "^14.5.0",
     "@types/react": "^17.0.33",
     "@types/react-dom": "^17.0.10",
     "@vitejs/plugin-react": "^1.0.7",
+    "config": "*",
+    "tsconfig": "*",
     "typescript": "^4.4.4",
     "vite": "^2.7.2",
-    "config": "*",
-    "tsconfig": "*"
+    "@graphql-codegen/typescript-operations": "2.2.2",
+    "@graphql-codegen/typescript": "2.4.2",
+    "@graphql-codegen/typescript-react-apollo": "3.2.4"
   }
 }

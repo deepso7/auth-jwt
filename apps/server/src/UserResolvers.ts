@@ -20,7 +20,7 @@ import { getConnection } from "typeorm";
 
 @ObjectType()
 class LoginResponse {
-  @Field()
+  @Field(() => String)
   accessToken!: string;
 }
 
