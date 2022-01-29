@@ -4,16 +4,45 @@ import { createConnection } from "typeorm";
 import express from "express";
 import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
+import cookieParser from "cookie-parser";
+import { verify } from "jsonwebtoken";
 
 import User from "./entity/User";
 import { UserResolver } from "./UserResolvers";
+import { createAccessToken, createRefreshToken } from "./auth";
+import { sendRefreshToken } from "./sendRefreshToken";
 
 (async () => {
   try {
     const app = express();
+    app.use(cookieParser());
 
     app.get("/", (_req, res) => {
       res.send("Bruhhh");
+    });
+
+    app.post("/refresh_token", async (req, res) => {
+      const token = req.cookies.jid;
+      if (!token) return res.status(400).json({ ok: false, accessToken: "" });
+
+      let payload: any = null;
+      try {
+        payload = verify(token, process.env.REFRESH_TOKEN_SECRET);
+      } catch (err) {
+        console.log(err);
+        return res.status(400).json({ ok: false, accessToken: "" });
+      }
+
+      try {
+        const user = await User.findOne({ id: payload.userId });
+        if (!user) return res.status(400).json({ ok: false, accessToken: "" });
+        // Update the refresh token
+        sendRefreshToken(res, createRefreshToken(user));
+        return res.json({ ok: true, accessToken: createAccessToken(user) });
+      } catch (err) {
+        console.log(err);
+        return res.status(500).json("Internal Server Error");
+      }
     });
 
     const apolloServer = new ApolloServer({

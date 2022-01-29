@@ -14,6 +14,7 @@ import User from "./entity/User";
 import { MyContext } from "./MyContext";
 import { createAccessToken, createRefreshToken } from "./auth";
 import { isAuth } from "./isAuth";
+import { sendRefreshToken } from "./sendRefreshToken";
 
 @ObjectType()
 class LoginResponse {
@@ -72,8 +73,8 @@ export class UserResolver {
     const valid = await argon2.verify(user.password, password);
     if (!valid) throw new Error("Invalid password");
 
-    // loginc successfull
-    res.cookie("jid", createRefreshToken(user), { httpOnly: true });
+    // loginc successfull, add refresh token in cookie
+    sendRefreshToken(res, createRefreshToken(user));
 
     return {
       accessToken: createAccessToken(user),

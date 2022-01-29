@@ -9,7 +9,7 @@ export const isAuth: MiddlewareFn<MyContext> = ({ context }, next) => {
     const token = authorization?.split(" ")[1];
     if (!token) throw new Error("No token provided");
 
-    const payload = verify(token, process.env.ACCESS_TOKEN_SECET);
+    const payload = verify(token, process.env.ACCESS_TOKEN_SECRET);
     context.payload = payload as any;
     return next();
   } catch (err) {
