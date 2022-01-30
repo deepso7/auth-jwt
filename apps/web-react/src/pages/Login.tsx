@@ -1,9 +1,54 @@
-import { FC } from "react";
+import { FC, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { useLoginMutation } from "../generated/graphql";
 
 interface LoginProps {}
 
 const Login: FC<LoginProps> = ({}) => {
-  return <div>Login Page</div>;
+  const navigate = useNavigate();
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [login] = useLoginMutation();
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    console.log({ email, password });
+    const res = await login({
+      variables: {
+        email,
+        password,
+      },
+    });
+
+    console.log({ res });
+
+    navigate("/");
+  };
+
+  return (
+    <form onSubmit={handleSubmit}>
+      <div>
+        <input
+          type="text"
+          placeholder="Email"
+          onChange={e => {
+            setEmail(e.target.value);
+          }}
+        />
+      </div>
+      <div>
+        <input
+          type="password"
+          placeholder="Password"
+          onChange={e => {
+            setPassword(e.target.value);
+          }}
+        />
+      </div>
+      <button type="submit">Login</button>
+    </form>
+  );
 };
 
 export default Login;
