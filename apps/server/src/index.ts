@@ -28,7 +28,7 @@ import { sendRefreshToken } from "./sendRefreshToken";
       res.send("Bruhhh");
     });
 
-    app.post("/refresh_token", async (req, res) => {
+    app.get("/refresh_token", async (req, res) => {
       const token = req.cookies.jid;
       if (!token) return res.status(400).json({ ok: false, accessToken: "" });
 

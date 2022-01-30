@@ -1,26 +1,32 @@
-import { FC } from "react";
-import { BrowserRouter, Route, Routes } from "react-router-dom";
-
-import Header from "./components/Header";
-import Bye from "./pages/Bye";
-import Home from "./pages/Home";
-import Login from "./pages/Login";
-import Register from "./pages/Register";
+import { FC, useEffect, useState } from "react";
+import { setAccessToken } from "./accessToken";
+import Router from "./Router";
 
 const App: FC = () => {
-  return (
-    <BrowserRouter>
-      <div>
-        <Header />
+  const [loading, setLoading] = useState(true);
 
-        <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="register" element={<Register />} />
-          <Route path="login" element={<Login />} />
-          <Route path="bye" element={<Bye />} />
-        </Routes>
-      </div>
-    </BrowserRouter>
+  useEffect(() => {
+    (async () => {
+      try {
+        const res = await fetch("http://localhost:4000/refresh_token", {
+          credentials: "include",
+        });
+        const { accessToken } = await res.json();
+        setAccessToken(accessToken);
+        setLoading(false);
+      } catch (err) {
+        console.log(err);
+        setLoading(false);
+      }
+    })();
+  }, []);
+
+  if (loading) return <div>loading...</div>;
+
+  return (
+    <>
+      <Router />
+    </>
   );
 };
 
