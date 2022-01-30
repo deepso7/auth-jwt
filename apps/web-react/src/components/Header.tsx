@@ -1,9 +1,12 @@
 import { FC } from "react";
 import { Link } from "react-router-dom";
+import { useMeQuery } from "../generated/graphql";
 
 interface HeaderProps {}
 
 const Header: FC<HeaderProps> = ({}) => {
+  const { data, loading } = useMeQuery();
+
   return (
     <>
       <header>
@@ -21,6 +24,11 @@ const Header: FC<HeaderProps> = ({}) => {
             <Link to="bye">Bye</Link>
           </div>
         </div>
+        {loading ? null : data?.me ? (
+          <div>You are logged in as {data.me.email}</div>
+        ) : (
+          <div>not logged in</div>
+        )}
       </header>
     </>
   );

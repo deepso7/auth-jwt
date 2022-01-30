@@ -16,12 +16,25 @@ import { sendRefreshToken } from "./sendRefreshToken";
 (async () => {
   try {
     const app = express();
+
+    const whitelist = [
+      "http://localhost:3000",
+      "https://studio.apollographql.com",
+    ];
     app.use(
       cors({
-        origin: "http://localhost:3000",
+        origin: (origin, callback) => {
+          if (!origin) return callback(null, true);
+          if (whitelist.indexOf(origin) !== -1) {
+            callback(null, true);
+          } else {
+            callback(new Error("Not allowed by CORS"));
+          }
+        },
         credentials: true,
       })
     );
+
     app.use(cookieParser());
 
     app.get("/", (_req, res) => {
