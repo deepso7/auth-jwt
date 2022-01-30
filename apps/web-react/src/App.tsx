@@ -2,6 +2,7 @@ import { FC } from "react";
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import Header from "./components/Header";
+import Bye from "./pages/Bye";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
@@ -16,6 +17,7 @@ const App: FC = () => {
           <Route path="/" element={<Home />} />
           <Route path="register" element={<Register />} />
           <Route path="login" element={<Login />} />
+          <Route path="bye" element={<Bye />} />
         </Routes>
       </div>
     </BrowserRouter>

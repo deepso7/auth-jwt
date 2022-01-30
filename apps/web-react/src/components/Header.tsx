@@ -17,6 +17,9 @@ const Header: FC<HeaderProps> = ({}) => {
           <div>
             <Link to="login">Login</Link>
           </div>
+          <div>
+            <Link to="bye">Bye</Link>
+          </div>
         </div>
       </header>
     </>
