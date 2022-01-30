@@ -43,21 +43,21 @@ import { sendRefreshToken } from "./sendRefreshToken";
 
     app.get("/refresh_token", async (req, res) => {
       const token = req.cookies.jid;
-      if (!token) return res.status(400).json({ ok: false, accessToken: "" });
+      if (!token) return res.json({ ok: false, accessToken: "" });
 
       let payload: any = null;
       try {
         payload = verify(token, process.env.REFRESH_TOKEN_SECRET);
       } catch (err) {
         console.log(err);
-        return res.status(400).json({ ok: false, accessToken: "" });
+        return res.json({ ok: false, accessToken: "" });
       }
 
       try {
         const user = await User.findOne({ id: payload.userId });
-        if (!user) return res.status(400).json({ ok: false, accessToken: "" });
+        if (!user) return res.json({ ok: false, accessToken: "" });
         if (user.tokenVersion !== payload.tokenVersion)
-          return res.status(400).json({ ok: false, accessToken: "" });
+          return res.json({ ok: false, accessToken: "" });
         // Update the refresh token
         sendRefreshToken(res, createRefreshToken(user));
         return res.json({ ok: true, accessToken: createAccessToken(user) });
