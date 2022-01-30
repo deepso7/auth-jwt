@@ -12,7 +12,7 @@ export const createRefreshToken = (user: User) => {
     { userId: user.id, tokenVersion: user.tokenVersion },
     process.env.REFRESH_TOKEN_SECRET,
     {
-      expiresIn: "15m",
+      expiresIn: "7d",
     }
   );
 };
