@@ -27,6 +27,7 @@ export type Mutation = {
   logout: Scalars['Boolean'];
   register: Scalars['Boolean'];
   revokeRefreshTokensForUser: Scalars['Boolean'];
+  web3LoginRegister: LoginResponse;
 };
 
 
@@ -46,6 +47,12 @@ export type MutationRevokeRefreshTokensForUserArgs = {
   userId: Scalars['Int'];
 };
 
+
+export type MutationWeb3LoginRegisterArgs = {
+  address: Scalars['String'];
+  signature: Scalars['String'];
+};
+
 export type Query = {
   __typename?: 'Query';
   bye: Scalars['String'];
@@ -56,7 +63,8 @@ export type Query = {
 
 export type User = {
   __typename?: 'User';
-  email: Scalars['String'];
+  address?: Maybe<Scalars['String']>;
+  email?: Maybe<Scalars['String']>;
   id: Scalars['Int'];
 };
 
@@ -76,7 +84,7 @@ export type LoginMutationVariables = Exact<{
 }>;
 
 
-export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'LoginResponse', accessToken: string, user: { __typename?: 'User', id: number, email: string } } };
+export type LoginMutation = { __typename?: 'Mutation', login: { __typename?: 'LoginResponse', accessToken: string, user: { __typename?: 'User', id: number, email?: string | null | undefined, address?: string | null | undefined } } };
 
 export type LogoutMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -86,7 +94,7 @@ export type LogoutMutation = { __typename?: 'Mutation', logout: boolean };
 export type MeQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'User', id: number, email: string } | null | undefined };
+export type MeQuery = { __typename?: 'Query', me?: { __typename?: 'User', id: number, email?: string | null | undefined, address?: string | null | undefined } | null | undefined };
 
 export type RegisterMutationVariables = Exact<{
   email: Scalars['String'];
@@ -99,7 +107,15 @@ export type RegisterMutation = { __typename?: 'Mutation', register: boolean };
 export type UsersQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type UsersQuery = { __typename?: 'Query', users: Array<{ __typename?: 'User', id: number, email: string }> };
+export type UsersQuery = { __typename?: 'Query', users: Array<{ __typename?: 'User', id: number, email?: string | null | undefined, address?: string | null | undefined }> };
+
+export type Web3LoginRegisterMutationVariables = Exact<{
+  signature: Scalars['String'];
+  address: Scalars['String'];
+}>;
+
+
+export type Web3LoginRegisterMutation = { __typename?: 'Mutation', web3LoginRegister: { __typename?: 'LoginResponse', accessToken: string, user: { __typename?: 'User', address?: string | null | undefined, email?: string | null | undefined, id: number } } };
 
 
 export const ByeDocument = gql`
@@ -173,6 +189,7 @@ export const LoginDocument = gql`
     user {
       id
       email
+      address
     }
   }
 }
@@ -239,6 +256,7 @@ export const MeDocument = gql`
   me {
     id
     email
+    address
   }
 }
     `;
@@ -306,6 +324,7 @@ export const UsersDocument = gql`
   users {
     id
     email
+    address
   }
 }
     `;
@@ -336,3 +355,42 @@ export function useUsersLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<User
 export type UsersQueryHookResult = ReturnType<typeof useUsersQuery>;
 export type UsersLazyQueryHookResult = ReturnType<typeof useUsersLazyQuery>;
 export type UsersQueryResult = Apollo.QueryResult<UsersQuery, UsersQueryVariables>;
+export const Web3LoginRegisterDocument = gql`
+    mutation Web3LoginRegister($signature: String!, $address: String!) {
+  web3LoginRegister(signature: $signature, address: $address) {
+    accessToken
+    user {
+      address
+      email
+      id
+    }
+  }
+}
+    `;
+export type Web3LoginRegisterMutationFn = Apollo.MutationFunction<Web3LoginRegisterMutation, Web3LoginRegisterMutationVariables>;
+
+/**
+ * __useWeb3LoginRegisterMutation__
+ *
+ * To run a mutation, you first call `useWeb3LoginRegisterMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useWeb3LoginRegisterMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [web3LoginRegisterMutation, { data, loading, error }] = useWeb3LoginRegisterMutation({
+ *   variables: {
+ *      signature: // value for 'signature'
+ *      address: // value for 'address'
+ *   },
+ * });
+ */
+export function useWeb3LoginRegisterMutation(baseOptions?: Apollo.MutationHookOptions<Web3LoginRegisterMutation, Web3LoginRegisterMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<Web3LoginRegisterMutation, Web3LoginRegisterMutationVariables>(Web3LoginRegisterDocument, options);
+      }
+export type Web3LoginRegisterMutationHookResult = ReturnType<typeof useWeb3LoginRegisterMutation>;
+export type Web3LoginRegisterMutationResult = Apollo.MutationResult<Web3LoginRegisterMutation>;
+export type Web3LoginRegisterMutationOptions = Apollo.BaseMutationOptions<Web3LoginRegisterMutation, Web3LoginRegisterMutationVariables>;

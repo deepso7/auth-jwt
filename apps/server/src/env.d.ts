@@ -4,6 +4,7 @@ declare global {
       DATABASE_URL: string;
       ACCESS_TOKEN_SECRET: string;
       REFRESH_TOKEN_SECRET: string;
+      SIGN_TOKEN_SECRET: string;
     }
   }
 }

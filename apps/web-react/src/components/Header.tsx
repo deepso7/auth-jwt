@@ -40,7 +40,7 @@ const Header: FC<HeaderProps> = ({}) => {
           </div>
         </div>
         {loading ? null : data?.me ? (
-          <div>You are logged in as {data.me.email}</div>
+          <div>You are logged in as {data.me.address || data.me.email}</div>
         ) : (
           <div>not logged in</div>
         )}

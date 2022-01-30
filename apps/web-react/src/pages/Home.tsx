@@ -1,6 +1,11 @@
 import { ethers } from "ethers";
 import { FC, useEffect, useState } from "react";
-import { useUsersQuery } from "../generated/graphql";
+import {
+  MeDocument,
+  MeQuery,
+  useUsersQuery,
+  useWeb3LoginRegisterMutation,
+} from "../generated/graphql";
 import useWeb3Modal from "../web3/useWeb3Modal";
 
 interface HomeProps {}
@@ -8,9 +13,55 @@ interface HomeProps {}
 const Home: FC<HomeProps> = ({}) => {
   const { data } = useUsersQuery({ fetchPolicy: "network-only" });
   const { provider, loadWeb3Modal, logoutOfWeb3Modal } = useWeb3Modal();
+  const [web3Login] = useWeb3LoginRegisterMutation();
 
   const [account, setAccount] = useState("");
   const [rendered, setRendered] = useState("");
+
+  const signMessage = async () => {
+    if (!provider) {
+      return;
+    }
+
+    try {
+      const accounts = await provider.listAccounts();
+      const address = accounts[0];
+
+      const signer = provider.getSigner(accounts[0]);
+      console.log({ signer });
+
+      const resp = await fetch(
+        `http://localhost:4000/sign_message?address=${address}`
+      );
+      const { jwt: message } = await resp.json();
+
+      const signature = await signer.signMessage(message);
+
+      console.log({ signature });
+
+      const res = await web3Login({
+        variables: {
+          address,
+          signature,
+        },
+        update: (store, { data }) => {
+          if (!data) return null;
+          store.writeQuery<MeQuery>({
+            query: MeDocument,
+            data: {
+              __typename: "Query",
+              me: data.web3LoginRegister.user,
+            },
+          });
+          return;
+        },
+      });
+
+      console.log({ res });
+    } catch (err) {
+      console.log(err);
+    }
+  };
 
   useEffect(() => {
     const fetchAccount = async () => {
@@ -30,12 +81,6 @@ const Home: FC<HomeProps> = ({}) => {
 
         const bal = await provider.getBalance(accounts[0]);
         console.log({ bal: ethers.utils.formatEther(bal) });
-
-        const signer = provider.getSigner(accounts[0]);
-        console.log({ signer });
-
-        const signedMessage = await signer.signMessage("hello");
-        console.log({ signedMessage });
 
         // Render either the ENS name or the shortened account address.
         if (name) {
@@ -86,7 +131,7 @@ const Home: FC<HomeProps> = ({}) => {
       <br />
       <br />
 
-      <h3>{}</h3>
+      <button onClick={signMessage}>Sign a message</button>
     </div>
   );
 };

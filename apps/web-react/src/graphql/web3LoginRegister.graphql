@@ -1,0 +1,10 @@
+mutation Web3LoginRegister($signature: String!, $address: String!) {
+  web3LoginRegister(signature: $signature, address: $address) {
+    accessToken
+    user {
+      address
+      email
+      id
+    }
+  }
+}

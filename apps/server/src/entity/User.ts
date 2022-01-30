@@ -8,12 +8,16 @@ export class User extends BaseEntity {
   @PrimaryGeneratedColumn()
   id!: number;
 
-  @Field()
-  @Column("text")
-  email!: string;
+  @Field({ nullable: true })
+  @Column("text", { nullable: true })
+  email?: string;
 
-  @Column("text")
-  password!: string;
+  @Field({ nullable: true })
+  @Column("text", { nullable: true })
+  address?: string;
+
+  @Column("text", { nullable: true })
+  password?: string;
 
   @Column("int", { default: 0 })
   tokenVersion!: number;

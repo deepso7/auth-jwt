@@ -1,17 +1,18 @@
 import "dotenv/config";
 import "reflect-metadata";
 import { createConnection } from "typeorm";
-import express from "express";
+import express, { Request, Response } from "express";
 import { ApolloServer } from "apollo-server-express";
 import { buildSchema } from "type-graphql";
 import cookieParser from "cookie-parser";
-import { verify } from "jsonwebtoken";
+import { sign, verify } from "jsonwebtoken";
 import cors from "cors";
 
 import User from "./entity/User";
 import { UserResolver } from "./UserResolvers";
 import { createAccessToken, createRefreshToken } from "./auth";
 import { sendRefreshToken } from "./sendRefreshToken";
+import { addressToJwtMap } from "./utils/addessToJwtMap";
 
 (async () => {
   try {
@@ -39,6 +40,18 @@ import { sendRefreshToken } from "./sendRefreshToken";
 
     app.get("/", (_req, res) => {
       res.send("Bruhhh");
+    });
+
+    app.get("/sign_message", (req: Request, res: Response) => {
+      const { address } = req.query;
+      if (!address || typeof address !== "string")
+        return res.status(400).json({ msg: "Address is required or invalid" });
+
+      const jwt = sign({ address }, process.env.SIGN_TOKEN_SECRET, {
+        expiresIn: "5m",
+      });
+      addressToJwtMap.set(address, jwt);
+      return res.json({ jwt });
     });
 
     app.get("/refresh_token", async (req, res) => {

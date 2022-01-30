@@ -10,6 +10,7 @@ import {
   UseMiddleware,
 } from "type-graphql";
 import argon2 from "argon2";
+import { ethers } from "ethers";
 
 import User from "./entity/User";
 import { MyContext } from "./MyContext";
@@ -18,6 +19,7 @@ import { isAuth } from "./isAuth";
 import { sendRefreshToken } from "./sendRefreshToken";
 import { getConnection } from "typeorm";
 import { verify } from "jsonwebtoken";
+import { addressToJwtMap } from "./utils/addessToJwtMap";
 
 @ObjectType()
 class LoginResponse {
@@ -104,12 +106,50 @@ export class UserResolver {
     const user = await User.findOne({ where: { email } });
 
     if (!user) throw new Error("User not found");
+    if (!user.password) throw new Error("Please sign in with your walllet");
 
     const valid = await argon2.verify(user.password, password);
     if (!valid) throw new Error("Invalid password");
 
     // loginc successfull, add refresh token in cookie
     sendRefreshToken(res, createRefreshToken(user));
+
+    return {
+      accessToken: createAccessToken(user),
+      user,
+    };
+  }
+
+  @Mutation(() => LoginResponse)
+  async web3LoginRegister(
+    @Arg("address") address: string,
+    @Arg("signature") signature: string,
+    @Ctx() { res }: MyContext
+  ): Promise<LoginResponse> {
+    let user = await User.findOne({ where: { address } });
+
+    if (!user)
+      await User.insert({
+        address,
+      });
+
+    user = await User.findOne({ where: { address } });
+
+    if (!user) throw new Error("User not found, this should never happen");
+
+    const message = addressToJwtMap.get(address);
+    if (!message) throw new Error("No message found, invalid!");
+
+    const payload: any = verify(message, process.env.SIGN_TOKEN_SECRET);
+    if (payload.address !== address) throw new Error("Invalid token!");
+
+    const recoveredAddress = ethers.utils.verifyMessage(message, signature);
+
+    if (recoveredAddress !== address) throw new Error("Invalid Signature");
+
+    // loginc successfull, add refresh token in cookie
+    sendRefreshToken(res, createRefreshToken(user));
+    addressToJwtMap.delete(address);
 
     return {
       accessToken: createAccessToken(user),
